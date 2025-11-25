@@ -207,3 +207,65 @@ main > .section:nth-of-type(2) {
         font-size: 15px;
     }
 }
+
+
+
+
+.fit-slider-section {
+    background: #fff;
+    padding: 40px 0; /* 緑波形との余白 */
+}
+
+.fit-slider {
+    position: relative;
+    width: 100%;
+    height: 40vh; /* PC */
+    overflow: hidden;
+}
+
+@media (max-width: 768px) {
+    .fit-slider {
+        height: 32vh; /* SPはちょい低め */
+    }
+}
+
+.fit-slider .slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 1.6s ease;
+}
+
+.fit-slider .slide.active {
+    opacity: 1;
+}
+
+.fit-slider .slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    animation: zoom 12s ease-in-out infinite;
+}
+
+@keyframes zoom {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.07); }
+}
+
+/* 木漏れ日レイヤー */
+.slider-lights {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(
+        circle,
+        rgba(255,255,255,0.25) 0%,
+        rgba(255,255,255,0) 70%
+    );
+    animation: lightMove 7s ease-in-out infinite alternate;
+}
+
+@keyframes lightMove {
+    0%   { transform: translate(-10%, -10%); opacity: 0.08; }
+    100% { transform: translate(10%, 10%); opacity: 0.18; }
+}

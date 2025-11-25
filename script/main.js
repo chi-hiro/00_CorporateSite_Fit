@@ -1,5 +1,7 @@
-/* ===== Reveal（交差観測） ===== */
-var io = new IntersectionObserver(
+/* =========================
+   フワッと現れる
+========================= */
+let io = new IntersectionObserver(
     function (entries) {
         entries.forEach(function (e) {
             if (e.isIntersecting) {
@@ -7,141 +9,150 @@ var io = new IntersectionObserver(
                 if (e.target.classList.contains("reveal-up")) {
                     e.target.classList.add("is-in");
                 }
-
-                // 左からスライドイン
-                if (e.target.classList.contains("reveal-left-in")) {
-                    e.target.classList.add("is-left-in");
-                }
-
-                // 右からスライドイン
-                if (e.target.classList.contains("reveal-right-in")) {
-                    e.target.classList.add("is-right-in");
-                }
-
                 io.unobserve(e.target); // 一度発火したら監視解除
             }
         });
     },
     { threshold: 0.15 }
 );
+// reveal-upクラスを持つ要素をioに追加する
+document.querySelectorAll(".reveal-up").forEach(function (el) {
+    io.observe(el);
+});
 
-// ▼監視対象を両方にする
-document
-    .querySelectorAll(".reveal-up, .reveal-left-in, .reveal-right-in")
-    .forEach(function (el) {
-        io.observe(el);
-    });
+/* =========================
+   右側の葉っぱの動き
+========================= */
+const leaf = document.querySelector(".right-edge");
+const trigger = document.querySelector("#section-service");
 
-/* ===== 木漏れ日（複数フィールド対応版） ===== */
+window.addEventListener("scroll", function () {
+    const triggerTop = trigger.offsetTop; // セクションのY位置
+    const scrollY = window.scrollY; // 今のスクロール量
+    const showPoint = triggerTop - 500; // しきい値
+
+    // 表示、非表示の判定
+    if (scrollY >= showPoint) {
+        leaf.classList.add("is-active");
+    } else {
+        leaf.classList.remove("is-active");
+    }
+});
+
+/* =========================
+   丘を下げる動き
+========================= */
+const hills = document.querySelector(".layer.hills");
+const speed = -0.4;
+
+window.addEventListener("scroll", function () {
+    const y = window.scrollY || 0;
+    hills.style.transform = `translateY(${-y * speed}px)`;
+});
+
+/* =========================
+   木漏れ日の動き
+========================= */
 const fields = Array.from(document.querySelectorAll(".apple-field"));
 
-function spawnApplesIn(field){
-  if (!field) return;
-  field.innerHTML = "";
-
-  const vw = Math.max(document.documentElement.clientWidth,  window.innerWidth  || 0);
-  const vh = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-
-  // 画面サイズ基準の粒数（重ければ係数を上げる/下げる）
-  const density = parseFloat(field.dataset.density || "1");
-  const count = Math.round((vw * vh) / 175000 * density);
-
-  for (let i = 0; i < count; i++) {
-    const a = document.createElement("div");
-    a.className = "apple";
-
-    a.style.setProperty("--x", (5 + Math.random() * 90).toFixed(2));
-    a.style.setProperty("--y", (5 + Math.random() * 90).toFixed(2));
-
-    a.style.setProperty("--delay", `${Math.random() * 4}s`);
-    a.style.setProperty("--dur",   `${6 + Math.random() * 5}s`);
-    a.style.setProperty("--move",  `${12 + Math.random() * 6}s`);
-
-    a.addEventListener("animationiteration", (e) => {
-      if (e.animationName !== "apple-pop") return;
-      a.style.setProperty("--x", (5 + Math.random() * 90).toFixed(2));
-      a.style.setProperty("--y", (5 + Math.random() * 90).toFixed(2));
-      // a.style.setProperty("--dur", `${6 + Math.random() * 5}s`); // 速度も揺らしたいなら
-    });
-
-    field.appendChild(a);
-  }
+// フィールドの回数実行
+function spawnAllApples() {
+    fields.forEach(spawnApplesIn);
 }
 
-function spawnAllApples(){
-  fields.forEach(spawnApplesIn);
+// 木漏れ日生成
+function spawnApplesIn(field) {
+    if (!field) return;
+    field.innerHTML = "";
+
+    // 表示領域のｗ・ｈを習得
+    const vw = Math.max(
+        document.documentElement.clientWidth,
+        window.innerWidth || 0
+    );
+    const vh = Math.max(
+        document.documentElement.clientHeight,
+        window.innerHeight || 0
+    );
+
+    // 画面サイズ基準の粒数（重ければ係数を上げる/下げる）
+    const density = parseFloat(field.dataset.density || "1");
+    const count = Math.round(((vw * vh) / 175000) * density);
+
+    for (let i = 0; i < count; i++) {
+        const a = document.createElement("div");
+
+        a.className = "apple";
+        a.style.setProperty("--x", (5 + Math.random() * 90).toFixed(2));
+        a.style.setProperty("--y", (5 + Math.random() * 90).toFixed(2));
+        a.style.setProperty("--delay", `${Math.random() * 4}s`);
+        a.style.setProperty("--dur", `${6 + Math.random() * 5}s`);
+        // CSSイメージ
+        //.apple {
+        //     left: calc(var(--x) * 1%);
+        //     top: calc(var(--y) * 1%);
+        //     animation-delay: var(--delay);
+        //     animation-duration: var(--dur);
+        // }
+
+        a.addEventListener("animationiteration", function (e) {
+            if (e.animationName !== "apple-pop") {
+                return; // フィルタ
+            }
+            let randX = (5 + Math.random() * 90).toFixed(2);
+            let randY = (5 + Math.random() * 90).toFixed(2);
+            a.style.setProperty("--x", randX);
+            a.style.setProperty("--y", randY);
+        });
+
+        field.appendChild(a);
+    }
 }
 
 // 初回
 spawnAllApples();
 
-// リサイズで再配置（デバウンス）
-window.addEventListener("resize", () => {
-  clearTimeout(window.__appleTimer);
-  window.__appleTimer = setTimeout(spawnAllApples, 200);
-});
-
-const hills = document.querySelector(".layer.hills");
-const speed = -0.4;
-
-window.addEventListener("scroll", () => {
-    const y = window.scrollY || 0;
-    hills.style.transform = `translateY(${-y * speed}px)`;
-});
-
+/* =========================
+   ハンバーガーメニュー
+========================= */
 const hamburger = document.getElementById("hamburger");
 const mobileNav = document.getElementById("mobile-nav");
 const navOverlay = document.getElementById("nav-overlay");
 
-hamburger.addEventListener("click", () => {
-  hamburger.classList.toggle("active");
-  mobileNav.classList.toggle("active");
-  navOverlay.classList.toggle("active");
-
-  // body全体に「nav-open」クラス付与（スクロール防止などに使える）
-  document.body.classList.toggle("nav-open");
+hamburger.addEventListener("click", function () {
+    hamburger.classList.toggle("active");
+    mobileNav.classList.toggle("active");
+    navOverlay.classList.toggle("active");
 });
 
 // 背景タップで閉じる
-navOverlay.addEventListener("click", () => {
-  hamburger.classList.remove("active");
-  mobileNav.classList.remove("active");
-  navOverlay.classList.remove("active");
-  document.body.classList.remove("nav-open");
+navOverlay.addEventListener("click", function () {
+    hamburger.classList.remove("active");
+    mobileNav.classList.remove("active");
+    navOverlay.classList.remove("active");
 });
 
-// ▼ ここに追記！（リンククリック時に閉じる）
+// リンククリック時に閉じる
 const navLinks = document.querySelectorAll("#mobile-nav a");
 
-navLinks.forEach(link => {
-  link.addEventListener("click", () => {
-    // スムーススクロール時間に合わせて遅延（ここでは800ms）
-    setTimeout(() => {
-      hamburger.classList.remove("active");
-      mobileNav.classList.remove("active");
-      navOverlay.classList.remove("active");
-      document.body.classList.remove("nav-open");
-    }, 900);
-  });
+navLinks.forEach(function (link) {
+    link.addEventListener("click", function () {
+        setTimeout(function () {
+            hamburger.classList.remove("active");
+            mobileNav.classList.remove("active");
+            navOverlay.classList.remove("active");
+            document.body.classList.remove("nav-open");
+        }, 900);
+    });
 });
 
-/* ===== 葉っぱ出す ===== */
-const leaf = document.querySelector(".right-edge");
-const trigger = document.querySelector("#section-service"); // トリガーにしたいセクション
+var slides = document.querySelectorAll(".fit-slider .slide");
+var index = 0;
 
-window.addEventListener("scroll", () => {
-    const triggerTop = trigger.offsetTop;      // セクションのY位置（ページ先頭から）
-    const scrollY = window.scrollY;           // 今のスクロール位置
+function changeSlide() {
+    slides[index].classList.remove("active");
+    index = (index + 1) % slides.length;
+    slides[index].classList.add("active");
+}
 
-    // どの位置から出すかのしきい値（少し早めに出したければ -200 とかにする）
-    const showPoint = triggerTop - 200;
-
-    if (scrollY >= showPoint) {
-        // セクションより下にいるあいだは ずっと表示
-        leaf.classList.add("is-active");
-    } else {
-        // セクションより上（まだ届いてない）なら非表示
-        leaf.classList.remove("is-active");
-    }
-});
-
+setInterval(changeSlide, 6000);
