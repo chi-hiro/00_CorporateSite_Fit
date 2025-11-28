@@ -4,7 +4,7 @@
 =========================================== */
 
 const GAS_URL =
-    "https://script.google.com/macros/s/AKfycbw55V4dvy9dFiPNIAdIWq1Tx774iCo8fA1MYSaAEhWaV8WiCH101jik0Y_SgekTQgRSkg/exec";
+    "https://script.google.com/macros/s/AKfycbzPX5qyzQb7Fv4hSpc2xqdYyw6qbhDHW5TZgKskrge-5wv2A3OYsSrKWP5Qs8iRUQZd/exec";
 
 document.addEventListener("DOMContentLoaded", () => {
     /* -----------------------------------------

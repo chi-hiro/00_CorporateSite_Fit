@@ -6,6 +6,7 @@ main > .section:nth-of-type(2) {
     z-index: 1;
     background: linear-gradient(180deg, #dbe8dd 0%, #b8d0b9 45%, #9fba9d 100%);
     isolation: isolate;
+    padding-bottom: 0;
 }
 
 /* =========================

@@ -112,47 +112,28 @@ function spawnApplesIn(field) {
 // 初回
 spawnAllApples();
 
-/* =========================
-   ハンバーガーメニュー
-========================= */
-const hamburger = document.getElementById("hamburger");
-const mobileNav = document.getElementById("mobile-nav");
-const navOverlay = document.getElementById("nav-overlay");
-
-hamburger.addEventListener("click", function () {
-    hamburger.classList.toggle("active");
-    mobileNav.classList.toggle("active");
-    navOverlay.classList.toggle("active");
+/* ==========================================
+   ハンバーガーメニュー(jQueryでやってみた)
+========================================== */
+// ハンバーガークリック
+$("#hamburger").on("click", function () {
+    $(this).toggleClass("active");
+    $("#mobile-nav").toggleClass("active");
+    $("#nav-overlay").toggleClass("active");
 });
 
 // 背景タップで閉じる
-navOverlay.addEventListener("click", function () {
-    hamburger.classList.remove("active");
-    mobileNav.classList.remove("active");
-    navOverlay.classList.remove("active");
+$("#nav-overlay").on("click", function () {
+    $("#hamburger").removeClass("active");
+    $("#mobile-nav").removeClass("active");
+    $(this).removeClass("active");
 });
 
 // リンククリック時に閉じる
-const navLinks = document.querySelectorAll("#mobile-nav a");
-
-navLinks.forEach(function (link) {
-    link.addEventListener("click", function () {
-        setTimeout(function () {
-            hamburger.classList.remove("active");
-            mobileNav.classList.remove("active");
-            navOverlay.classList.remove("active");
-            document.body.classList.remove("nav-open");
-        }, 900);
-    });
+$("#mobile-nav a").on("click", function () {
+    setTimeout(function () {
+        $("#hamburger").removeClass("active");
+        $("#mobile-nav").removeClass("active");
+        $("#nav-overlay").removeClass("active");
+    }, 900);
 });
-
-var slides = document.querySelectorAll(".fit-slider .slide");
-var index = 0;
-
-function changeSlide() {
-    slides[index].classList.remove("active");
-    index = (index + 1) % slides.length;
-    slides[index].classList.add("active");
-}
-
-setInterval(changeSlide, 6000);
